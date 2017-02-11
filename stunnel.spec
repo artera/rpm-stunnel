@@ -1,7 +1,7 @@
 Summary: An SSL-encrypting socket wrapper
 Name: stunnel
 Version: 5.35
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Group: Applications/Internet
 URL: http://www.stunnel.org/
@@ -106,6 +106,9 @@ cp %{SOURCE7} $RPM_BUILD_ROOT%{_unitdir}/%{name}@.service
 %endif
 
 %changelog
+* Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.35-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
 * Thu Jul 21 2016 Tomáš Mráz <tmraz@redhat.com> - 5.35-1
 - New upstream release 5.35 with fix for bug #1358810
 
