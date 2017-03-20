@@ -1,7 +1,10 @@
-Summary: An SSL-encrypting socket wrapper
+# Do not generate provides for private libraries
+%global __provides_exclude_from ^%{_libdir}/stunnel/.*$
+
+Summary: A TLS-encrypting socket wrapper
 Name: stunnel
-Version: 5.35
-Release: 2%{?dist}
+Version: 5.40
+Release: 1%{?dist}
 License: GPLv2
 Group: Applications/Internet
 URL: http://www.stunnel.org/
@@ -13,12 +16,12 @@ Source4: stunnel-sfinger.conf
 Source5: pop3-redirect.xinetd
 Source6: stunnel-pop3s-client.conf
 Source7: stunnel@.service
-Patch0: stunnel-5.30-authpriv.patch
-Patch1: stunnel-systemd-service.patch
+Patch0: stunnel-5.40-authpriv.patch
+Patch1: stunnel-5.40-systemd-service.patch
 Patch2: stunnel-configure-ac.patch
 # util-linux is needed for rename
 BuildRequires: openssl-devel, pkgconfig, tcp_wrappers-devel, util-linux
-BuildRequires: autoconf automake
+BuildRequires: autoconf automake libtool
 BuildRequires: /usr/bin/pod2man
 BuildRequires: /usr/bin/pod2html
 %if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
@@ -29,9 +32,10 @@ Requires(postun): systemd-units
 %endif
 
 %description
-Stunnel is a socket wrapper which can provide SSL (Secure Sockets
-Layer) support to ordinary applications. For example, it can be used
-in conjunction with imapd to create an SSL secure IMAP server.
+Stunnel is a socket wrapper which can provide TLS/SSL
+(Transport Layer Security/Secure Sockets Layer) support
+to ordinary applications. For example, it can be used in
+conjunction with imapd to create a TLS secure IMAP server.
 
 %prep
 %setup -q
@@ -40,7 +44,7 @@ in conjunction with imapd to create an SSL secure IMAP server.
 %patch2 -p1
 
 %build
-autoreconf
+autoreconf -v
 CFLAGS="$RPM_OPT_FLAGS -fPIC"; export CFLAGS
 if pkg-config openssl ; then
 	CFLAGS="$CFLAGS `pkg-config --cflags openssl`";
@@ -51,30 +55,32 @@ fi
 make V=1 LDADD="-pie -Wl,-z,defs,-z,relro,-z,now"
 
 %install
-#rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
+#rm -rf %{buildroot}
+make install DESTDIR=%{buildroot}
 # Move the translated man pages to the right subdirectories, and strip off the
 # language suffixes.
 #for lang in fr pl ; do
 for lang in pl ; do
-	mkdir -p $RPM_BUILD_ROOT/%{_mandir}/${lang}/man8
-	mv $RPM_BUILD_ROOT/%{_mandir}/man8/*.${lang}.8* $RPM_BUILD_ROOT/%{_mandir}/${lang}/man8/
-	rename ".${lang}" "" $RPM_BUILD_ROOT/%{_mandir}/${lang}/man8/*
+	mkdir -p %{buildroot}/%{_mandir}/${lang}/man8
+	mv %{buildroot}/%{_mandir}/man8/*.${lang}.8* %{buildroot}/%{_mandir}/${lang}/man8/
+	rename ".${lang}" "" %{buildroot}/%{_mandir}/${lang}/man8/*
 done
 mkdir srpm-docs
 cp %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6} srpm-docs
 %if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
-mkdir -p $RPM_BUILD_ROOT%{_unitdir}
-cp $RPM_BUILD_ROOT%{_datadir}/doc/stunnel/examples/%{name}.service $RPM_BUILD_ROOT%{_unitdir}/%{name}.service
-cp %{SOURCE7} $RPM_BUILD_ROOT%{_unitdir}/%{name}@.service
+mkdir -p %{buildroot}%{_unitdir}
+cp %{buildroot}%{_datadir}/doc/stunnel/examples/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
+cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 %endif
 
 %files
-%doc AUTHORS BUGS ChangeLog COPY* CREDITS PORTS README TODO
+%{!?_licensedir:%global license %%doc}
+%doc AUTHORS BUGS ChangeLog CREDITS PORTS README TODO
 %doc tools/stunnel.conf-sample
 %doc srpm-docs/*
+%license COPY*
 %lang(en) %doc doc/en/*
-%lang(po) %doc doc/pl/*
+%lang(pl) %doc doc/pl/*
 %{_bindir}/stunnel
 %exclude %{_bindir}/stunnel3
 %exclude %{_datadir}/doc/stunnel
@@ -106,6 +112,13 @@ cp %{SOURCE7} $RPM_BUILD_ROOT%{_unitdir}/%{name}@.service
 %endif
 
 %changelog
+* Mon Mar 20 2017 Neal Gompa <ngompa@datto.com> - 5.40-1
+- New upstream release 5.40
+- Properly mark license files
+- Rebase patches
+- Eliminate unnecessary Provides
+- Small spec cleanups and fixes
+
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.35-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
