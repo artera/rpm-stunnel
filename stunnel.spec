@@ -3,7 +3,7 @@
 
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
-Version: 5.40
+Version: 5.41
 Release: 1%{?dist}
 License: GPLv2
 Group: Applications/Internet
@@ -112,6 +112,9 @@ cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 %endif
 
 %changelog
+* Mon Apr 17 2017 Neal Gompa <ngompa@datto.com> - 5.41-1
+- New upstream release 5.41
+
 * Mon Mar 20 2017 Neal Gompa <ngompa@datto.com> - 5.40-1
 - New upstream release 5.40
 - Properly mark license files
