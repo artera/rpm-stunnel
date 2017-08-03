@@ -4,7 +4,7 @@
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
 Version: 5.41
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 Group: Applications/Internet
 URL: http://www.stunnel.org/
@@ -112,6 +112,9 @@ cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 %endif
 
 %changelog
+* Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.41-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
+
 * Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.41-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
