@@ -3,8 +3,8 @@
 
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
-Version: 5.41
-Release: 3%{?dist}
+Version: 5.42
+Release: 1%{?dist}
 License: GPLv2
 Group: Applications/Internet
 URL: http://www.stunnel.org/
@@ -19,6 +19,7 @@ Source7: stunnel@.service
 Patch0: stunnel-5.40-authpriv.patch
 Patch1: stunnel-5.40-systemd-service.patch
 Patch2: stunnel-configure-ac.patch
+Patch3: stunnel-5.42-system-ciphers.patch
 # util-linux is needed for rename
 BuildRequires: openssl-devel, pkgconfig, tcp_wrappers-devel, util-linux
 BuildRequires: autoconf automake libtool
@@ -40,11 +41,15 @@ conjunction with imapd to create a TLS secure IMAP server.
 %prep
 %setup -q
 %patch0 -p1 -b .authpriv
-%patch1 -p1
-%patch2 -p1
+%patch1 -p1 -b .systemd-service
+#%patch2 -p1 -b .fips-config
+%patch3 -p1 -b .system-ciphers
+
+# Fix the configure script output for FIPS mode
+sed -i '/yes).*result: no/,+1s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/' configure
 
 %build
-autoreconf -v
+#autoreconf -v
 CFLAGS="$RPM_OPT_FLAGS -fPIC"; export CFLAGS
 if pkg-config openssl ; then
 	CFLAGS="$CFLAGS `pkg-config --cflags openssl`";
@@ -112,6 +117,10 @@ cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 %endif
 
 %changelog
+* Tue Aug 22 2017 Tomáš Mráz <tmraz@redhat.com> - 5.42-1
+- New upstream release 5.42
+- Use the system cipher list by default (#1483967)
+
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.41-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
