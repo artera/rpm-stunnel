@@ -3,7 +3,7 @@
 
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
-Version: 5.42
+Version: 5.44
 Release: 1%{?dist}
 License: GPLv2
 Group: Applications/Internet
@@ -18,10 +18,9 @@ Source6: stunnel-pop3s-client.conf
 Source7: stunnel@.service
 Patch0: stunnel-5.40-authpriv.patch
 Patch1: stunnel-5.40-systemd-service.patch
-Patch2: stunnel-configure-ac.patch
 Patch3: stunnel-5.42-system-ciphers.patch
 # util-linux is needed for rename
-BuildRequires: openssl-devel, pkgconfig, tcp_wrappers-devel, util-linux
+BuildRequires: openssl-devel, pkgconfig, util-linux
 BuildRequires: autoconf automake libtool
 BuildRequires: /usr/bin/pod2man
 BuildRequires: /usr/bin/pod2html
@@ -42,11 +41,10 @@ conjunction with imapd to create a TLS secure IMAP server.
 %setup -q
 %patch0 -p1 -b .authpriv
 %patch1 -p1 -b .systemd-service
-#%patch2 -p1 -b .fips-config
 %patch3 -p1 -b .system-ciphers
 
 # Fix the configure script output for FIPS mode
-sed -i '/yes).*result: no/,+1s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/' configure
+sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/}' configure
 
 %build
 #autoreconf -v
@@ -55,7 +53,7 @@ if pkg-config openssl ; then
 	CFLAGS="$CFLAGS `pkg-config --cflags openssl`";
 	LDFLAGS="`pkg-config --libs-only-L openssl`"; export LDFLAGS
 fi
-%configure --enable-fips --enable-ipv6 --with-ssl=%{_prefix}\
+%configure --enable-fips --enable-ipv6 --disable-libwrap --with-ssl=%{_prefix}\
 	CPPFLAGS="-UPIDFILE -DPIDFILE='\"%{_localstatedir}/run/stunnel.pid\"'"
 make V=1 LDADD="-pie -Wl,-z,defs,-z,relro,-z,now"
 
@@ -117,6 +115,10 @@ cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 %endif
 
 %changelog
+* Thu Jan 11 2018 Tomáš Mráz <tmraz@redhat.com> - 5.44-1
+- New upstream release 5.44
+- Disable libwrap support (#1518789)
+
 * Tue Aug 22 2017 Tomáš Mráz <tmraz@redhat.com> - 5.42-1
 - New upstream release 5.42
 - Use the system cipher list by default (#1483967)
