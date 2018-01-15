@@ -1,10 +1,16 @@
 # Do not generate provides for private libraries
 %global __provides_exclude_from ^%{_libdir}/stunnel/.*$
 
+%if 0%{?fedora} > 27 || 0%{?rhel} > 7
+%bcond_with libwrap
+%else
+%bcond_without libwrap
+%endif
+
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
 Version: 5.44
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Group: Applications/Internet
 URL: http://www.stunnel.org/
@@ -22,6 +28,9 @@ Patch3: stunnel-5.42-system-ciphers.patch
 # util-linux is needed for rename
 BuildRequires: openssl-devel, pkgconfig, util-linux
 BuildRequires: autoconf automake libtool
+%if %{with libwrap}
+Buildrequires: tcp_wrappers-devel
+%endif
 BuildRequires: /usr/bin/pod2man
 BuildRequires: /usr/bin/pod2html
 %if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
@@ -53,7 +62,12 @@ if pkg-config openssl ; then
 	CFLAGS="$CFLAGS `pkg-config --cflags openssl`";
 	LDFLAGS="`pkg-config --libs-only-L openssl`"; export LDFLAGS
 fi
-%configure --enable-fips --enable-ipv6 --disable-libwrap --with-ssl=%{_prefix}\
+%configure --enable-fips --enable-ipv6 --with-ssl=%{_prefix} \
+%if %{with libwrap}
+--enable-libwrap \
+%else
+--disable-libwrap \
+%endif
 	CPPFLAGS="-UPIDFILE -DPIDFILE='\"%{_localstatedir}/run/stunnel.pid\"'"
 make V=1 LDADD="-pie -Wl,-z,defs,-z,relro,-z,now"
 
@@ -115,6 +129,9 @@ cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 %endif
 
 %changelog
+* Mon Jan 15 2018 Tomáš Mráz <tmraz@redhat.com> - 5.44-2
+- Make the disablement of libwrap conditional
+
 * Thu Jan 11 2018 Tomáš Mráz <tmraz@redhat.com> - 5.44-1
 - New upstream release 5.44
 - Disable libwrap support (#1518789)
