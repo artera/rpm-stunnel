@@ -10,7 +10,7 @@
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
 Version: 5.44
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 Group: Applications/Internet
 URL: http://www.stunnel.org/
@@ -33,12 +33,8 @@ Buildrequires: tcp_wrappers-devel
 %endif
 BuildRequires: /usr/bin/pod2man
 BuildRequires: /usr/bin/pod2html
-%if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
-BuildRequires: systemd-units
-Requires(post): systemd-units
-Requires(preun): systemd-units
-Requires(postun): systemd-units
-%endif
+BuildRequires: systemd
+%{?systemd_requires}
 
 %description
 Stunnel is a socket wrapper which can provide TLS/SSL
@@ -113,22 +109,19 @@ cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 
 %post
 /sbin/ldconfig
-%if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
 %systemd_post %{name}.service
-%endif
 
 %preun
-%if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
 %systemd_preun %{name}.service
-%endif
 
 %postun
 /sbin/ldconfig
-%if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
 %systemd_postun_with_restart %{name}.service
-%endif
 
 %changelog
+* Thu Jan 25 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 5.44-3
+- Fix systemd executions/requirements
+
 * Mon Jan 15 2018 Tomáš Mráz <tmraz@redhat.com> - 5.44-2
 - Make the disablement of libwrap conditional
 
