@@ -10,7 +10,7 @@
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
 Version: 5.44
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 Group: Applications/Internet
 URL: http://www.stunnel.org/
@@ -119,6 +119,9 @@ cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.44-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
 * Thu Jan 25 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 5.44-3
 - Fix systemd executions/requirements
 
