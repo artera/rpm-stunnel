@@ -10,7 +10,7 @@
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
 Version: 5.44
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2
 Group: Applications/Internet
 URL: http://www.stunnel.org/
@@ -25,7 +25,9 @@ Source7: stunnel@.service
 Patch0: stunnel-5.40-authpriv.patch
 Patch1: stunnel-5.40-systemd-service.patch
 Patch3: stunnel-5.42-system-ciphers.patch
+Patch4: stunnel-5.44-bind.patch
 # util-linux is needed for rename
+BuildRequires: gcc
 BuildRequires: openssl-devel, pkgconfig, util-linux
 BuildRequires: autoconf automake libtool
 %if %{with libwrap}
@@ -47,6 +49,7 @@ conjunction with imapd to create a TLS secure IMAP server.
 %patch0 -p1 -b .authpriv
 %patch1 -p1 -b .systemd-service
 %patch3 -p1 -b .system-ciphers
+%patch4 -p1 -b .bind
 
 # Fix the configure script output for FIPS mode
 sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/}' configure
@@ -68,7 +71,6 @@ fi
 make V=1 LDADD="-pie -Wl,-z,defs,-z,relro,-z,now"
 
 %install
-#rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 # Move the translated man pages to the right subdirectories, and strip off the
 # language suffixes.
@@ -85,6 +87,9 @@ mkdir -p %{buildroot}%{_unitdir}
 cp %{buildroot}%{_datadir}/doc/stunnel/examples/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
 cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 %endif
+
+%check
+make test
 
 %files
 %{!?_licensedir:%global license %%doc}
@@ -119,6 +124,9 @@ cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Fri Mar  2 2018 Tomáš Mráz <tmraz@redhat.com> - 5.44-5
+- Fix bind to localhost (patch backport by Christian Kujau) (#1542361)
+
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.44-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
