@@ -9,8 +9,8 @@
 
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
-Version: 5.44
-Release: 5%{?dist}
+Version: 5.46
+Release: 1%{?dist}
 License: GPLv2
 Group: Applications/Internet
 URL: http://www.stunnel.org/
@@ -24,8 +24,7 @@ Source6: stunnel-pop3s-client.conf
 Source7: stunnel@.service
 Patch0: stunnel-5.40-authpriv.patch
 Patch1: stunnel-5.40-systemd-service.patch
-Patch3: stunnel-5.42-system-ciphers.patch
-Patch4: stunnel-5.44-bind.patch
+Patch3: stunnel-5.46-system-ciphers.patch
 # util-linux is needed for rename
 BuildRequires: gcc
 BuildRequires: openssl-devel, pkgconfig, util-linux
@@ -49,7 +48,6 @@ conjunction with imapd to create a TLS secure IMAP server.
 %patch0 -p1 -b .authpriv
 %patch1 -p1 -b .systemd-service
 %patch3 -p1 -b .system-ciphers
-%patch4 -p1 -b .bind
 
 # Fix the configure script output for FIPS mode
 sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/}' configure
@@ -124,6 +122,9 @@ make test
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Thu May 31 2018 Tomáš Mráz <tmraz@redhat.com> - 5.46-1
+- New upstream release 5.46
+
 * Fri Mar  2 2018 Tomáš Mráz <tmraz@redhat.com> - 5.44-5
 - Fix bind to localhost (patch backport by Christian Kujau) (#1542361)
 
