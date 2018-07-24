@@ -34,6 +34,8 @@ Buildrequires: tcp_wrappers-devel
 %endif
 BuildRequires: /usr/bin/pod2man
 BuildRequires: /usr/bin/pod2html
+# build test requirements
+BuildRequires: /usr/bin/nc, /usr/bin/lsof, /usr/bin/ps
 BuildRequires: systemd
 %{?systemd_requires}
 
@@ -51,6 +53,9 @@ conjunction with imapd to create a TLS secure IMAP server.
 
 # Fix the configure script output for FIPS mode
 sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/}' configure
+
+# Fix a testcase with system-ciphers support
+sed -i '/client = yes/a \\  ciphers = PSK' tests/recipes/014_PSK_secrets
 
 %build
 #autoreconf -v
