@@ -51,8 +51,8 @@ conjunction with imapd to create a TLS secure IMAP server.
 %patch1 -p1 -b .systemd-service
 %patch3 -p1 -b .system-ciphers
 
-# Fix the configure script output for FIPS mode
-sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/}' configure
+# Fix the configure script output for FIPS mode and stack protector flag
+sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/};s/-fstack-protector/-fstack-protector-strong/' configure
 
 # Fix a testcase with system-ciphers support
 sed -i '/client = yes/a \\  ciphers = PSK' tests/recipes/014_PSK_secrets
