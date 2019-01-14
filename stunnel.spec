@@ -9,7 +9,7 @@
 
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
-Version: 5.48
+Version: 5.50
 Release: 1%{?dist}
 License: GPLv2
 Group: Applications/Internet
@@ -22,8 +22,8 @@ Source4: stunnel-sfinger.conf
 Source5: pop3-redirect.xinetd
 Source6: stunnel-pop3s-client.conf
 Source7: stunnel@.service
-Patch0: stunnel-5.40-authpriv.patch
-Patch1: stunnel-5.40-systemd-service.patch
+Patch0: stunnel-5.50-authpriv.patch
+Patch1: stunnel-5.50-systemd-service.patch
 Patch3: stunnel-5.46-system-ciphers.patch
 # util-linux is needed for rename
 BuildRequires: gcc
@@ -135,6 +135,9 @@ make test
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Mon Jan 14 2019 Tomáš Mráz <tmraz@redhat.com> - 5.50-1
+- New upstream release 5.50
+
 * Tue Jul 24 2018 Tomáš Mráz <tmraz@redhat.com> - 5.48-1
 - New upstream release 5.48
 
