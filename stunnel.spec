@@ -12,7 +12,6 @@ Name: stunnel
 Version: 5.50
 Release: 1%{?dist}
 License: GPLv2
-Group: Applications/Internet
 URL: http://www.stunnel.org/
 Source0: https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz
 Source1: https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz.asc
