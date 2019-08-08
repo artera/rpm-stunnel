@@ -9,8 +9,8 @@
 
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
-Version: 5.50
-Release: 3%{?dist}
+Version: 5.55
+Release: 1%{?dist}
 License: GPLv2
 URL: http://www.stunnel.org/
 Source0: https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz
@@ -23,7 +23,6 @@ Source6: stunnel-pop3s-client.conf
 Source7: stunnel@.service
 Patch0: stunnel-5.50-authpriv.patch
 Patch1: stunnel-5.50-systemd-service.patch
-Patch3: stunnel-5.46-system-ciphers.patch
 # util-linux is needed for rename
 BuildRequires: gcc
 BuildRequires: openssl-devel, pkgconfig, util-linux
@@ -34,7 +33,7 @@ Buildrequires: tcp_wrappers-devel
 BuildRequires: /usr/bin/pod2man
 BuildRequires: /usr/bin/pod2html
 # build test requirements
-BuildRequires: /usr/bin/nc, /usr/bin/lsof, /usr/bin/ps
+BuildRequires: /usr/bin/nc, lsof, /usr/bin/ps
 BuildRequires: systemd
 %{?systemd_requires}
 
@@ -48,7 +47,6 @@ conjunction with imapd to create a TLS secure IMAP server.
 %setup -q
 %patch0 -p1 -b .authpriv
 %patch1 -p1 -b .systemd-service
-%patch3 -p1 -b .system-ciphers
 
 # Fix the configure script output for FIPS mode and stack protector flag
 sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/};s/-fstack-protector/-fstack-protector-strong/' configure
@@ -134,6 +132,9 @@ make test
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Thu Aug 08 2019 Massimiliano Torromeo <massimiliano.torromeo@gmail.com> - 5.55-1
+- New upstream release 5.55
+
 * Sat Jul 27 2019 Fedora Release Engineering <releng@fedoraproject.org> - 5.50-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
@@ -324,7 +325,7 @@ make test
 - Sourced URL of sha256 hash file in spec file.
 
 * Tue Mar 26 2013 Avesh Agarwal <avagarwa@redhat.com> - 4.55-2
-- Resolves: 927841 
+- Resolves: 927841
 
 * Mon Mar 4 2013 Avesh Agarwal <avagarwa@redhat.com> - 4.55-1
 - New upstream realease 4.55
